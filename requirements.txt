@@ -1,0 +1,12 @@
+pandas
+plotly
+streamlit
+streamlit-option-menu
+streamlit-card
+streamlit-antd-components
+itables
+joblib
+numpy
+nltk
+sastrawi
+scikit-learn
