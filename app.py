@@ -20,6 +20,7 @@ from dashboard_menu.classification_viz import create_donut_chart
 from dashboard_menu.yearly_P3M import yearly_P3M_viz
 from dashboard_menu.card import tampilkan_kartu_summary
 from dashboard_menu.filter_dataset import filter_dataset_by_year
+from clasify_menu.clasify_model import load_model_and_predict
 
 # Membaca data dari file CSV
 data_penelitian = pd.read_excel("E:/kuliah/Tugas Akhir/code/fix code/data_revisi/penelitian_categorized.xlsx")
@@ -443,15 +444,8 @@ elif main_menu == "Klasifikasi Judul":
 
                     # Clasify the title
                     if jenis == "Penelitian":
-                        model = load("svm_model_penelitian.joblib")  # Use load from joblib
-                        vectorizer = load("vectorizer_penelitian.joblib")
-
-                        # Ubah judul jadi vektor fitur
-                        judul_vector = vectorizer.transform([judul]) 
-
-                        # Prediksi
-                        # result = model.predict(judul_vector)[0]
-                        # result = result[0]
+                        preds = load_model_and_predict(str(judul), model_path='rf_model_penelitian.joblib', vectorizer_path='tfidf_vectorizer_penelitian.joblib')
+                        st.write(preds)
 
                     else:
                         # Load the model for Pengabdian Masyarakat
@@ -574,17 +568,17 @@ elif main_menu == "Klasifikasi Judul":
                             mime="text/csv"
                         )
                         
-                        # Also provide Excel download option
-                        buffer = io.BytesIO()
-                        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                            mapped_df.to_excel(writer, sheet_name='Sheet1', index=False)
+                        # # Also provide Excel download option
+                        # buffer = io.BytesIO()
+                        # with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+                        #     mapped_df.to_excel(writer, sheet_name='Sheet1', index=False)
                         
-                        st.download_button(
-                            label="Download Data yang Telah Diolah (Excel)",
-                            data=buffer.getvalue(),
-                            file_name="data_proyek_diolah.xlsx",
-                            mime="application/vnd.ms-excel"
-                        )
+                        # st.download_button(
+                        #     label="Download Data yang Telah Diolah (Excel)",
+                        #     data=buffer.getvalue(),
+                        #     file_name="data_proyek_diolah.xlsx",
+                        #     mime="application/vnd.ms-excel"
+                        # )
                         
             except Exception as e:
                 st.error(f"Error: {e}")

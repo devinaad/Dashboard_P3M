@@ -1,7 +1,10 @@
 import streamlit as st
+from clasify_model import load_model_and_predict
+
 jenis = "Penelitian"
 judul = "Judul Penelitian"
 tahun = 2016
+
 # CSS untuk mempercantik tampilan
 st.markdown("""
     <style>
@@ -43,10 +46,8 @@ st.markdown(f"""
 
 # Clasify the title
 if jenis == "Penelitian":
-    # Load the model for Penelitian
-    # model = load_model("path_to_penelitian_model")
-    # result = model.predict(df)
-    result = "Klasifikasi Penelitian"
+    preds = load_model_and_predict("judul", model_path='rf_model_penelitian.joblib', vectorizer_path='tfidf_vectorizer.joblib')
+    st.write(preds)
 else:
     # Load the model for Pengabdian Masyarakat
     # model = load_model("path_to_pengmas_model")
