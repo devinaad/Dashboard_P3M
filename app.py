@@ -2,7 +2,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.io as pio
 import streamlit as st
-from datetime import datetime
 from itertools import islice
 from plotly.subplots import make_subplots
 from streamlit_option_menu import option_menu
