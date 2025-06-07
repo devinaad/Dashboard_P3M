@@ -1,6 +1,10 @@
 # Metrics Cards 
 import streamlit as st
 
+def count_data(data, kategori):
+    return str(len(data))
+
+
 def tampilkan_kartu_summary(
     total_penelitian: int,
     total_pengmas: int,

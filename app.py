@@ -20,7 +20,6 @@ from dashboard_menu.classification_viz import create_donut_chart
 from dashboard_menu.yearly_P3M import yearly_P3M_viz
 from dashboard_menu.card import tampilkan_kartu_summary
 from dashboard_menu.filter_dataset import filter_dataset_by_year
-from clasify_menu.clasify_model import load_model_and_predict
 
 # Membaca data dari file CSV
 data_penelitian = pd.read_excel("E:/kuliah/Tugas Akhir/code/fix code/data_revisi/penelitian_categorized.xlsx")
@@ -30,8 +29,8 @@ data_pengmas = pd.read_excel("E:/kuliah/Tugas Akhir/code/fix code/fix_data/pengm
 st.set_page_config(
     page_title="Analytics Dashboard",
     page_icon="📊",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide",  # Biarkan "wide" untuk tampilan luas
+    initial_sidebar_state="expanded"  # Sidebar tetap muncul
 )
 
 # Warna untuk kategori
@@ -40,8 +39,7 @@ colors = [
     "#FFA15A", "#19D3F3", "#FF6692"
 ]
 
-
-# Custom CSS 
+# Custom CSS - versi default dinamis
 st.markdown("""
 <style>
     /* Latar belakang utama */
@@ -49,30 +47,26 @@ st.markdown("""
         background-color: #f8fafc;
     }
 
-    /* Sidebar styling */
+    /* Sidebar default, tidak dikunci */
     [data-testid="stSidebar"] {
         background-color: white;
-        min-width: 250px !important;
-        max-width: 0px !important;
     }
 
-    /* Container untuk seluruh halaman */
+    /* Container halaman tanpa pembatas max-width */
     .block-container {
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        max-width: 1200px !important;
     }
 
-    /* Card untuk metrik */
+    /* Card metrik */
     .metric-card {
         border-radius: 0.5rem;
-        padding: 0.5rem; /* Diperbaiki agar lebih terlihat */
-        margin: 0.5rem 0; /* Tambahkan margin agar tidak terlalu rapat */
+        padding: 0.5rem;
+        margin: 0.5rem 0;
         background-color: white;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    /* Warna khusus untuk metrik */
     .metric-card.blue {
         background-color: #dbeafe;
     }
@@ -82,11 +76,10 @@ st.markdown("""
     .metric-card.yellow {
         background-color: #fef9c3;
     }
-        .metric-card.purple {
+    .metric-card.purple {
         background-color: #f3e8ff;
     }
 
-    /* Nilai pada card metrik */
     .metric-value {
         font-size: 1.5rem;
         font-weight: 700;
@@ -94,30 +87,26 @@ st.markdown("""
         color: #1e293b;
     }
 
-    /* Label pada card metrik */
     .metric-label {
         text-align: center;
         color: #475569;
         font-size: 1rem;
-        margin-top: 0.25rem; /* Margin lebih proporsional */
+        margin-top: 0.25rem;
     }
 
-    /* Grid untuk card */
     .card-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr); /* 4 kolom */
-        gap: 0.7rem; /* Jarak antar card */
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.7rem;
         padding: 1rem 0;
     }
 
-    /* Plotly chart styling */
     .stPlotlyChart {
-        outline: 10px solid #b8f9fc; /* Warna latar belakang plot */
+        outline: 10px solid #b8f9fc;
         border-radius: 5px;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.3);
     }
 
-    /* Judul plot */
     .plot-title {
         color: black;
         text-align: center;
@@ -126,10 +115,9 @@ st.markdown("""
         border-radius: 5px;
         font-weight: bold;
     }
-    </style>
+</style>
+""", unsafe_allow_html=True)
 
-    """, unsafe_allow_html=True
-)
 
 # Sidebar
 with st.sidebar:
@@ -147,7 +135,8 @@ with st.sidebar:
         size='lg',
         variant='filled', 
         color='indigo', 
-        open_all=True
+        open_all=True,
+        index=2
     )
 # Main content
 if main_menu == "Dashboard":
@@ -243,9 +232,22 @@ if main_menu == "Dashboard":
                     y=df[category],
                     name=category,
                     marker_color=colors[i % len(colors)],
-                    hovertemplate='%{y:,.0f} juta rupiah<extra></extra>'  # Hover text format
+                    hovertemplate='<b>%{fullData.name}</b><br>%{y:,.0f} juta rupiah<extra></extra>'
                 ))
             
+            # Hitung total per tahun (bar)
+            totals = df[fields].sum(axis=1)
+
+            # Tambahkan trace untuk menampilkan total di atas bar
+            fig.add_trace(go.Scatter(
+                x=df.index,
+                y=totals,
+                mode='text',
+                text=[f"{val:,.0f} juta" for val in totals],
+                textposition='top center',
+                showlegend=False,
+                textfont=dict(size=12, color='black')
+            ))
             # Update layout for better appearance
             fig.update_layout(
                 title={
@@ -259,7 +261,7 @@ if main_menu == "Dashboard":
                 xaxis_title="Tahun",
                 yaxis_title="Dana (dalam Juta Rupiah)",
                 barmode='stack',
-                legend_title="Kategori",
+                showlegend=False, 
                 hovermode="closest",
                 height=300,
                 xaxis=dict(
@@ -272,7 +274,9 @@ if main_menu == "Dashboard":
                 hoverlabel=dict(
                     bgcolor="white",
                     font_size=14
-                )
+                ),
+                margin=dict(l=10, r=10,t=40, b=5),  # Margin bawah kecil karena legend dipisah
+
             )
             
             return fig
@@ -338,248 +342,3 @@ elif main_menu == "Klasifikasi Pengabdian Masyarakat":
 elif main_menu == "Klasifikasi Judul":
     st.markdown("<h1 style='text-align: center; color: #323b4f;'>Klasifikasi Judul</h1>", unsafe_allow_html=True)
 
-    # Create tabs
-    tab1, tab2 = st.tabs(["Manual Input", "File Upload"])
-
-    # Tab 1: Manual Input
-    with tab1:
-        st.header("Manual Data Input")
-        
-        # Create form for manual input
-        with st.form(key="manual_input_form"):
-            # Form fields based on specified requirements
-            judul = st.text_input("Judul (Judul Penelitian/Pengabdian) *")
-            
-            # Year selection
-            current_year = datetime.datetime.now().year
-            years = list(range(current_year-10, current_year+1))
-            tahun = st.selectbox("Tahun *", years)
-            
-            # ketua = st.text_input("Ketua *")
-            
-            # # Multiline input for anggota
-            # anggota = st.text_area("Anggota (Tulis satu anggota per baris jika lebih dari satu) *")
-            
-            # Jenis selection
-            jenis = st.selectbox("Jenis *", ["Penelitian", "Pengabdian Masyarakat"])
-            
-            st.markdown("**Semua field harus diisi*")
-            
-            # Submit button
-            submit_button = st.form_submit_button(label="Clasify")
-        
-        # Handle form submission
-        if submit_button:
-            # Validate all fields are filled
-            if not judul:
-                st.error("Judul harus diisi!")
-            # elif not ketua:
-            #     st.error("Ketua harus diisi!")
-            # elif not anggota:
-            #     st.error("Anggota harus diisi!")
-            else:
-                # # Process anggota - split by newline
-                # anggota_list = [a.strip() for a in anggota.split('\n') if a.strip()]
-                
-                # if not anggota_list:
-                #     st.error("Anggota harus diisi dengan benar!")
-                # else:
-                #     anggota_str = ', '.join(anggota_list)
-                    
-                    # Create DataFrame from inputs
-                    data = {
-                        "Judul": [judul],
-                        "Tahun": [tahun],
-                        # "Ketua": [ketua],
-                        # "Anggota": [anggota_str],
-                        "Jenis": [jenis]
-                    }
-                    
-
-                    
-                    # Show anggota as a list for clearer display
-                    # if anggota_list:
-                    #     st.subheader("Daftar Anggota:")
-                    #     for i, ang in enumerate(anggota_list, 1):
-                    #         st.write(f"{i}. {ang}")
-                    
-                    # CSS untuk mempercantik tampilan
-                    st.markdown("""
-                        <style>
-                            .success-box {
-                                background-color: #d4edda;
-                                border-left: 5px solid #28a745;
-                                padding: 1rem;
-                                border-radius: 10px;
-                                margin-bottom: 20px;
-                            }
-                            .section-header {
-                                font-size: 24px;
-                                font-weight: 600;
-                                color: #2c3e50;
-                                margin-top: 30px;
-                                margin-bottom: 10px;
-                            }
-                            .result-box {
-                                background-color: #f0f8ff;
-                                border-left: 5px solid #1e90ff;
-                                padding: 1rem;
-                                border-radius: 10px;
-                            }
-                        </style>
-                    """, unsafe_allow_html=True)
-
-                    # Show the entered data
-                    st.markdown('<div class="success-box">✅ <strong>Data berhasil disubmit!</strong></div>', unsafe_allow_html=True)
-
-                    st.markdown('<div class="section-header">📋 Data yang Dimasukkan</div>', unsafe_allow_html=True)
-                    # st.dataframe(df)
-                    st.markdown(f"""
-                        <div class="result-box">
-                            <strong>Judul:</strong> {judul}<br>
-                            <strong>Jenis Data:</strong> {jenis}<br>
-                            <strong>Tahun:</strong> {tahun}<br>
-                        </div>
-                    """, unsafe_allow_html=True)
-
-                    # Clasify the title
-                    if jenis == "Penelitian":
-                        preds = load_model_and_predict(str(judul), model_path='rf_model_penelitian.joblib', vectorizer_path='tfidf_vectorizer_penelitian.joblib')
-                        st.write(preds)
-
-                    else:
-                        # Load the model for Pengabdian Masyarakat
-                        # model = load_model("path_to_pengmas_model")
-                        # result = model.predict(df)
-                        result = "Klasifikasi Pengabdian Masyarakat"
-
-                    result = "Artificial Intelligence and Data Science"  # Dummy result for testing
-                    st.markdown('<div class="section-header">📚 Hasil Klasifikasi</div>', unsafe_allow_html=True)
-                    st.markdown(f'<div class="result-box"><strong>{result}</strong></div>', unsafe_allow_html=True)
-
-
-    # Tab 2: File Upload
-    with tab2:
-        st.header("File Upload")
-        
-        # File type selection
-        file_type = st.radio("Pilih Jenis File", ["CSV", "Excel"])
-        
-        # File uploader based on selected type
-        if file_type == "CSV":
-            uploaded_file = st.file_uploader("Pilih file CSV", type="csv")
-        else:
-            uploaded_file = st.file_uploader("Pilih file Excel", type=["xlsx", "xls"])
-        
-        if uploaded_file is not None:
-            # Read the file
-            try:
-                # Load the data based on file type
-                if file_type == "CSV":
-                    df = pd.read_csv(uploaded_file)
-                else:
-                    df = pd.read_excel(uploaded_file)
-                
-                # Display file info
-                st.subheader("Informasi File")
-                st.write(f"Jumlah Baris: {df.shape[0]}, Jumlah Kolom: {df.shape[1]}")
-                
-                # Display data preview
-                st.subheader("Preview Data")
-                st.dataframe(df.head(5))
-                
-                # Column mapping
-                st.subheader("Pemetaan Kolom")
-                st.write("Pilih kolom dari file yang sesuai dengan field yang diperlukan:")
-                
-                # Get column names from the dataframe
-                column_options = ["-- Pilih Kolom --"] + list(df.columns)
-                
-                # Create column mapping form
-                with st.form(key="column_mapping_form"):
-                    judul_col = st.selectbox("Kolom untuk Judul *", column_options)
-                    tahun_col = st.selectbox("Kolom untuk Tahun *", column_options)
-                    ketua_col = st.selectbox("Kolom untuk Ketua *", column_options)
-                    anggota_col = st.selectbox("Kolom untuk Anggota *", column_options)
-                    jenis_col = st.selectbox("Kolom untuk Jenis *", column_options)
-                    
-                    st.markdown("**Semua field harus dipilih*")
-                    
-                    map_button = st.form_submit_button(label="Proses Data")
-                
-                if map_button:
-                    # Validate all fields are selected
-                    if judul_col == "-- Pilih Kolom --" or tahun_col == "-- Pilih Kolom --" or ketua_col == "-- Pilih Kolom --" or anggota_col == "-- Pilih Kolom --" or jenis_col == "-- Pilih Data --":
-                        st.error("Semua field harus dipilih!")
-                    else:
-                        # Create new dataframe with mapped columns
-                        mapped_df = pd.DataFrame({
-                            "Judul": df[judul_col],
-                            "Tahun": df[tahun_col],
-                            "Ketua": df[ketua_col],
-                            "Anggota": df[anggota_col],
-                            "Jenis": df[jenis_col]
-                        })
-                        
-                        # Check for empty values
-                        empty_values = False
-                        for col in ["Judul", "Tahun", "Ketua", "Anggota", "Jenis"]:
-                            if mapped_df[col].isna().any():
-                                empty_values = True
-                                st.warning(f"Kolom {col} memiliki nilai kosong. Semua nilai harus diisi.")
-                        
-                        if empty_values:
-                            st.error("Data berisi nilai kosong. Semua field harus diisi.")
-                        
-                        # Display processed data
-                        st.subheader("Data yang Dipetakan")
-                        st.dataframe(mapped_df.head(10))
-                        
-                        # Basic statistics
-                        st.subheader("Ringkasan Data")
-                        
-                        # Count by year
-                        st.write("Jumlah Proyek per Tahun:")
-                        year_counts = mapped_df["Tahun"].value_counts().sort_index()
-                        st.bar_chart(year_counts)
-                        
-                        # Count by Jenis
-                        st.write("Jumlah Proyek berdasarkan Jenis:")
-                        jenis_counts = mapped_df["Jenis"].value_counts()                      
-                        st.write(jenis_counts)
-                        
-                        # Data processing options
-                        st.subheader("Pengolahan Data")
-                        
-                        # Example actions with the data
-                        if st.button("Hapus Data Duplikat"):
-                            original_count = mapped_df.shape[0]
-                            mapped_df = mapped_df.drop_duplicates(subset=["Judul", "Tahun", "Ketua"])
-                            new_count = mapped_df.shape[0]
-                            st.write(f"Menghapus {original_count - new_count} baris duplikat.")
-                            st.dataframe(mapped_df.head(10))
-                        
-                        # Download processed data
-                        csv = mapped_df.to_csv(index=False).encode('utf-8')
-                        st.download_button(
-                            label="Download Data yang Telah Diolah (CSV)",
-                            data=csv,
-                            file_name="data_proyek_diolah.csv",
-                            mime="text/csv"
-                        )
-                        
-                        # # Also provide Excel download option
-                        # buffer = io.BytesIO()
-                        # with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-                        #     mapped_df.to_excel(writer, sheet_name='Sheet1', index=False)
-                        
-                        # st.download_button(
-                        #     label="Download Data yang Telah Diolah (Excel)",
-                        #     data=buffer.getvalue(),
-                        #     file_name="data_proyek_diolah.xlsx",
-                        #     mime="application/vnd.ms-excel"
-                        # )
-                        
-            except Exception as e:
-                st.error(f"Error: {e}")
-                st.write("Pastikan file Anda diformat dengan benar.")
