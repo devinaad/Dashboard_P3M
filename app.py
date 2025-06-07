@@ -20,9 +20,15 @@ from dashboard_menu.yearly_P3M import yearly_P3M_viz
 from dashboard_menu.card import tampilkan_kartu_summary
 from dashboard_menu.filter_dataset import filter_dataset_by_year
 
-# Membaca data dari file CSV
-data_penelitian = pd.read_excel("E:/kuliah/Tugas Akhir/code/fix code/data_revisi/penelitian_categorized.xlsx")
-data_pengmas = pd.read_excel("E:/kuliah/Tugas Akhir/code/fix code/fix_data/pengmas_categorized.xlsx",'Sheet1')
+
+def load_data(file):
+    if file.name.endswith('.csv'):
+        return pd.read_csv(file)
+    elif file.name.endswith('.xlsx'):
+        return pd.read_excel(file)
+    else:
+        st.error("Format file tidak dikenali.")
+        return None
 
 # Set page config
 st.set_page_config(
@@ -46,12 +52,12 @@ st.markdown("""
         background-color: #f8fafc;
     }
 
-    /* Sidebar default, tidak dikunci */
+    /* Sidebar default */
     [data-testid="stSidebar"] {
         background-color: white;
     }
 
-    /* Container halaman tanpa pembatas max-width */
+    /* Container */
     .block-container {
         padding-left: 2rem !important;
         padding-right: 2rem !important;
@@ -120,224 +126,267 @@ st.markdown("""
 
 # Sidebar
 with st.sidebar:
+    # Check if data has been uploaded (you'll need to adapt this condition based on your actual data storage)
+    # Example conditions - replace with your actual data check logic:
+    data_uploaded = st.session_state.get('data_uploaded', False)
+    # Or check if specific data exists:
+    # data_uploaded = 'uploaded_data' in st.session_state and st.session_state.uploaded_data is not None
+    
     main_menu = sac.menu(
         items=[
             sac.MenuItem('Menu', disabled=True),
             sac.MenuItem(type='divider'),
-            sac.MenuItem('Dashboard', icon='house'),
-            sac.MenuItem('Dataset', icon='table', children=[
-                sac.MenuItem('Klasifikasi Penelitian', icon='file-text'),
-                sac.MenuItem('Klasifikasi Pengabdian Masyarakat', icon='people')
-            ]),
-            sac.MenuItem('Klasifikasi Judul', icon='tag')
+            sac.MenuItem('Beranda', icon='house-door'),
+            sac.MenuItem('Dashboard', icon='speedometer2', disabled=not data_uploaded),
+            sac.MenuItem('Dataset', icon='table', disabled=not data_uploaded, children=[
+                sac.MenuItem('Klasifikasi Penelitian', icon='file-text', disabled=not data_uploaded),
+                sac.MenuItem('Klasifikasi Pengabdian Masyarakat', icon='people', disabled=not data_uploaded)
+            ])
         ],
         size='lg',
         variant='filled', 
         color='indigo', 
         open_all=True,
-        index=2
+        index=2  # This will select "Beranda" as default (index 2 after Menu and divider)
     )
+
 # Main content
-if main_menu == "Dashboard":
-    st.markdown("<h1 style='text-align: center; color: #323b4f;'>Analytics Dashboard</h1>", unsafe_allow_html=True)
-
-    filtered_penelitian, filtered_pengmas, label_tahun = filter_dataset_by_year(data_penelitian, data_pengmas)
-
-    # Metrics Cards 
-    # Data dummy untuk contoh
-    total_penelitian = 664
-    total_pengmas = 565
-    top_penelitian = "Power & Energy System"
-    top_pengmas = "Software Development"
-
-    # Menampilkan Card summary data
-    tampilkan_kartu_summary(total_penelitian, total_pengmas, top_penelitian, top_pengmas)
-
-    #Visualisasi perbandingan jumlah penelitian dan pengabdian masyarakat per tahun
-    yearly_P3M_viz(filtered_penelitian, filtered_pengmas)
-
-    # Data untuk donut chart
-    fields = [
-        "Robotics and Mechatronics",
-        "Telecommunications and Networking",
-        "Power and Energy Systems",
-        "Artificial Intelligence and Data Science",
-        "Sensors and Embedded Systems",
-        "Digital Media and Entertainment",
-        "Software Development",
-    ]
-    values1 =  [103, 50, 115, 108, 113, 74, 98]
-    values2 = [32, 42, 70, 38, 69, 82, 115]
-
-    # Layout Streamlit
-    col1, col2 = st.columns(2, gap="large")
-
+if main_menu == 'Beranda':
+    # Your Beranda page logic here
+    st.title("🏠 Beranda")
+    st.write("Selamat datang! Silakan upload data Anda untuk memulai.")
+    
+    # File upload section (example)
+    col1, col2 = st.columns(2)
     with col1:
-        choose_ptm1 = st.selectbox(
-            "Pilih Data",
-            ["Penelitian", "Pengabdian Masyarakat"],
-            key="ptm1"
-        )
-
-        if choose_ptm1 == "Penelitian":
-            fig1 = create_donut_chart(fields, values1, "Kategori Data Penelitian P3M")
-            st.plotly_chart(fig1, use_container_width=True)
-        else:
-            fig2 = create_donut_chart(fields, values2, "Kategori Data Pengabdian Masyarakat P3M")
-            st.plotly_chart(fig2, use_container_width=True)
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
+        uploaded_penelitian = st.file_uploader("Upload Data Penelitian", type=['csv', 'xlsx'])
     with col2:
-        choose_ptm2 = st.selectbox(
-            "Pilih Data",
-            ["Penelitian", "Pengabdian Masyarakat"],
-            key="ptm2"
+        uploaded_pengabdian = st.file_uploader("Upload Data Pengabdian Masyarakat", type=['csv', 'xlsx']
+                                               )
+    if uploaded_penelitian is not None and uploaded_pengabdian is not None:
+        st.session_state['data_uploaded'] = True
+        st.session_state['uploaded_penelitian'] = uploaded_penelitian
+        st.session_state['uploaded_pengabdian'] = uploaded_pengabdian
+        st.success("Data berhasil diupload! Menu lain sekarang dapat diakses.")
+        st.rerun()
+    
+elif main_menu == "Dashboard":
+    if st.session_state.get('data_uploaded', False):
+        uploaded_penelitian = st.session_state.get('uploaded_penelitian')
+        uploaded_pengabdian = st.session_state.get('uploaded_pengabdian')
+
+        st.markdown("<h1 style='text-align: center; color: #323b4f;'>Analytics Dashboard</h1>", unsafe_allow_html=True)
+
+        filtered_penelitian, filtered_pengmas, label_tahun = filter_dataset_by_year(
+            uploaded_penelitian, uploaded_pengabdian
         )
-        # Sample data for Penelitian (research)
-        penelitian_data = {}
-        years = list(range(2016, 2025))  # Last 10 years
-        for category in fields:
-            # Generate random funding data with an increasing trend
-            base_value = np.random.randint(50, 200)
-            trend = np.random.uniform(1.05, 1.15)  # Slight upward trend
-            fluctuation = np.random.uniform(0.8, 1.2, size=len(years))
-            values = [int(base_value * (trend ** i) * fluctuation[i]) for i in range(len(years))]
-            penelitian_data[category] = values
 
-        # Sample data for Pengabdian Masyarakat (community service)
-        pengabdian_data = {}
-        for category in fields:
-            # Generate different random funding data with an increasing trend
-            base_value = np.random.randint(30, 150)
-            trend = np.random.uniform(1.03, 1.12)  # Slight upward trend
-            fluctuation = np.random.uniform(0.85, 1.15, size=len(years))
-            values = [int(base_value * (trend ** i) * fluctuation[i]) for i in range(len(years))]
-            pengabdian_data[category] = values
+        # Metrics Cards 
+        # Data dummy untuk contoh
+        total_penelitian = 664
+        total_pengmas = 565
+        top_penelitian = "Power & Energy System"
+        top_pengmas = "Software Development"
 
-        def create_plotly_stacked_bar(df, title):
-            fig = go.Figure()
-            
-            # Define a colorful palette
-            colors = [
-                "#636EFA", "#EF553B", "#00CC96", "#AB63FA",
-                "#FFA15A", "#19D3F3", "#FF6692"
-            ]
-            
-            # Add each category as a separate trace
-            for i, category in enumerate(fields):
-                fig.add_trace(go.Bar(
-                    x=df.index,
-                    y=df[category],
-                    name=category,
-                    marker_color=colors[i % len(colors)],
-                    hovertemplate='<b>%{fullData.name}</b><br>%{y:,.0f} juta rupiah<extra></extra>'
-                ))
-            
-            # Hitung total per tahun (bar)
-            totals = df[fields].sum(axis=1)
+        # Menampilkan Card summary data
+        tampilkan_kartu_summary(total_penelitian, total_pengmas, top_penelitian, top_pengmas)
 
-            # Tambahkan trace untuk menampilkan total di atas bar
-            fig.add_trace(go.Scatter(
-                x=df.index,
-                y=totals,
-                mode='text',
-                text=[f"{val:,.0f} juta" for val in totals],
-                textposition='top center',
-                showlegend=False,
-                textfont=dict(size=12, color='black')
-            ))
-            # Update layout for better appearance
-            fig.update_layout(
-                title={
-                    'text': f"Total Dana {title} per Kategori (2015-2024)",
-                    'y':0.95,
-                    'x':0.5,
-                    'xanchor': 'center',
-                    'yanchor': 'top',
-                    'font': {'size': 17}
-                },
-                xaxis_title="Tahun",
-                yaxis_title="Dana (dalam Juta Rupiah)",
-                barmode='stack',
-                showlegend=False, 
-                hovermode="closest",
-                height=300,
-                xaxis=dict(
-                    tickmode='linear',
-                    tickvals=years
-                ),
-                yaxis=dict(
-                    tickformat=',d'
-                ),
-                hoverlabel=dict(
-                    bgcolor="white",
-                    font_size=14
-                ),
-                margin=dict(l=10, r=10,t=40, b=5),  # Margin bawah kecil karena legend dipisah
+        #Visualisasi perbandingan jumlah penelitian dan pengabdian masyarakat per tahun
+        yearly_P3M_viz(filtered_penelitian, filtered_pengmas)
 
+        # Data untuk donut chart
+        fields = [
+            "Robotics and Mechatronics",
+            "Telecommunications and Networking",
+            "Power and Energy Systems",
+            "Artificial Intelligence and Data Science",
+            "Sensors and Embedded Systems",
+            "Digital Media and Entertainment",
+            "Software Development",
+        ]
+        values1 =  [103, 50, 115, 108, 113, 74, 98]
+        values2 = [32, 42, 70, 38, 69, 82, 115]
+
+        # Layout Streamlit
+        col1, col2 = st.columns(2, gap="large")
+
+        with col1:
+            choose_ptm1 = st.selectbox(
+                "Pilih Data",
+                ["Penelitian", "Pengabdian Masyarakat"],
+                key="ptm1"
             )
-            
-            return fig
-        # Convert to DataFrames
-        df_penelitian = pd.DataFrame(penelitian_data, index=years)
-        df_pengabdian = pd.DataFrame(pengabdian_data, index=years)
-        if choose_ptm2 == "Penelitian":
-            fig_penelitian_fund = create_plotly_stacked_bar(df_penelitian, "Penelitian")
-            st.plotly_chart(fig_penelitian_fund, use_container_width=True)
-        else:
-            fig_pengmas_fund = create_plotly_stacked_bar(df_pengabdian, "Pengabdian Masyarakat")
-            st.plotly_chart(fig_pengmas_fund, use_container_width=True)
 
-        st.markdown('</div>', unsafe_allow_html=True)
+            if choose_ptm1 == "Penelitian":
+                fig1 = create_donut_chart(fields, values1, "Kategori Data Penelitian P3M")
+                st.plotly_chart(fig1, use_container_width=True)
+            else:
+                fig2 = create_donut_chart(fields, values2, "Kategori Data Pengabdian Masyarakat P3M")
+                st.plotly_chart(fig2, use_container_width=True)
 
-    # Membuat figure kosong
-    fig = go.Figure()
+            st.markdown('</div>', unsafe_allow_html=True)
 
-    # Fungsi untuk menambahkan trace untuk legend
-    def add_trace_to_legend(name, color):
-        fig.add_trace(go.Scatter(
-            x=[None],  # Tidak ada data, hanya legend
-            y=[None],
-            name=name,
-            mode="lines",
-            line=dict(color=color, width=4)  # Warna sesuai
-        ))
+        with col2:
+            choose_ptm2 = st.selectbox(
+                "Pilih Data",
+                ["Penelitian", "Pengabdian Masyarakat"],
+                key="ptm2"
+            )
+            # Sample data for Penelitian (research)
+            penelitian_data = {}
+            years = list(range(2016, 2025))  # Last 10 years
+            for category in fields:
+                # Generate random funding data with an increasing trend
+                base_value = np.random.randint(50, 200)
+                trend = np.random.uniform(1.05, 1.15)  # Slight upward trend
+                fluctuation = np.random.uniform(0.8, 1.2, size=len(years))
+                values = [int(base_value * (trend ** i) * fluctuation[i]) for i in range(len(years))]
+                penelitian_data[category] = values
 
-    # Menambahkan traces untuk setiap field secara otomatis
-    for field, color in zip(fields, colors):
-        add_trace_to_legend(field, color)
+            # Sample data for Pengabdian Masyarakat (community service)
+            pengabdian_data = {}
+            for category in fields:
+                # Generate different random funding data with an increasing trend
+                base_value = np.random.randint(30, 150)
+                trend = np.random.uniform(1.03, 1.12)  # Slight upward trend
+                fluctuation = np.random.uniform(0.85, 1.15, size=len(years))
+                values = [int(base_value * (trend ** i) * fluctuation[i]) for i in range(len(years))]
+                pengabdian_data[category] = values
 
-    # Update layout untuk hanya menampilkan legend di tengah
-    fig.update_layout(
-        showlegend=True,
-        legend=dict(
-            orientation="h",  # Horizontal legend
-            yanchor="middle",  # Vertikal center
-            y=0.5,             # Posisi tengah secara vertikal
-            xanchor="center",  # Horizontal center
-            x=0.5,             # Posisi tengah secara horizontal
-            font=dict(size=12)  # Ukuran font
-        ),
-        plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
-        paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper
-        xaxis=dict(visible=False),      # Hide x-axis
-        yaxis=dict(visible=False),      # Hide y-axis
-        margin=dict(l=0, r=0, t=0, b=0, pad=0),  # Remove margins
-        height=100  # Adjust height as needed
-    )
+            def create_plotly_stacked_bar(df, title):
+                fig = go.Figure()
+                
+                # Define a colorful palette
+                colors = [
+                    "#636EFA", "#EF553B", "#00CC96", "#AB63FA",
+                    "#FFA15A", "#19D3F3", "#FF6692"
+                ]
+                
+                # Add each category as a separate trace
+                for i, category in enumerate(fields):
+                    fig.add_trace(go.Bar(
+                        x=df.index,
+                        y=df[category],
+                        name=category,
+                        marker_color=colors[i % len(colors)],
+                        hovertemplate='<b>%{fullData.name}</b><br>%{y:,.0f} juta rupiah<extra></extra>'
+                    ))
+                
+                # Hitung total per tahun (bar)
+                totals = df[fields].sum(axis=1)
 
-    # Menampilkan plot
-    st.plotly_chart(fig,use_container_width=True)
+                # Tambahkan trace untuk menampilkan total di atas bar
+                fig.add_trace(go.Scatter(
+                    x=df.index,
+                    y=totals,
+                    mode='text',
+                    text=[f"{val:,.0f} juta" for val in totals],
+                    textposition='top center',
+                    showlegend=False,
+                    textfont=dict(size=12, color='black')
+                ))
+                # Update layout for better appearance
+                fig.update_layout(
+                    title={
+                        'text': f"Total Dana {title} per Kategori (2015-2024)",
+                        'y':0.95,
+                        'x':0.5,
+                        'xanchor': 'center',
+                        'yanchor': 'top',
+                        'font': {'size': 17}
+                    },
+                    xaxis_title="Tahun",
+                    yaxis_title="Dana (dalam Juta Rupiah)",
+                    barmode='stack',
+                    showlegend=False, 
+                    hovermode="closest",
+                    height=300,
+                    xaxis=dict(
+                        tickmode='linear',
+                        tickvals=years
+                    ),
+                    yaxis=dict(
+                        tickformat=',d'
+                    ),
+                    hoverlabel=dict(
+                        bgcolor="white",
+                        font_size=14
+                    ),
+                    margin=dict(l=10, r=10,t=40, b=5),  # Margin bawah kecil karena legend dipisah
+
+                )
+                
+                return fig
+            # Convert to DataFrames
+            df_penelitian = pd.DataFrame(penelitian_data, index=years)
+            df_pengabdian = pd.DataFrame(pengabdian_data, index=years)
+            if choose_ptm2 == "Penelitian":
+                fig_penelitian_fund = create_plotly_stacked_bar(df_penelitian, "Penelitian")
+                st.plotly_chart(fig_penelitian_fund, use_container_width=True)
+            else:
+                fig_pengmas_fund = create_plotly_stacked_bar(df_pengabdian, "Pengabdian Masyarakat")
+                st.plotly_chart(fig_pengmas_fund, use_container_width=True)
+
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        # Membuat figure kosong
+        fig = go.Figure()
+
+        # Fungsi untuk menambahkan trace untuk legend
+        def add_trace_to_legend(name, color):
+            fig.add_trace(go.Scatter(
+                x=[None],  # Tidak ada data, hanya legend
+                y=[None],
+                name=name,
+                mode="lines",
+                line=dict(color=color, width=4)  # Warna sesuai
+            ))
+
+        # Menambahkan traces untuk setiap field secara otomatis
+        for field, color in zip(fields, colors):
+            add_trace_to_legend(field, color)
+
+        # Update layout untuk hanya menampilkan legend di tengah
+        fig.update_layout(
+            showlegend=True,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                yanchor="middle",  # Vertikal center
+                y=0.5,             # Posisi tengah secara vertikal
+                xanchor="center",  # Horizontal center
+                x=0.5,             # Posisi tengah secara horizontal
+                font=dict(size=12)  # Ukuran font
+            ),
+            plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
+            paper_bgcolor='rgba(0,0,0,0)',  # Transparent paper
+            xaxis=dict(visible=False),      # Hide x-axis
+            yaxis=dict(visible=False),      # Hide y-axis
+            margin=dict(l=0, r=0, t=0, b=0, pad=0),  # Remove margins
+            height=100  # Adjust height as needed
+        )
+
+        # Menampilkan plot
+        st.plotly_chart(fig,use_container_width=True)
+    else:
+        st.warning("Silakan upload data di halaman Beranda terlebih dahulu.")
+
 
 elif main_menu == "Klasifikasi Penelitian":
-    # st.markdown("<h2 style='text-align: center; color: #323b4f;'>Klasifikasi Penelitian</h1>", unsafe_allow_html=True)
-    show_table(data_penelitian, "Penelitian")
+    if st.session_state.get('data_uploaded', False):
+        uploaded_penelitian = st.session_state.get('uploaded_penelitian')
+        data_penelitian = load_data(uploaded_penelitian)  # pastikan fungsi `load_data()` sesuai
+        show_table(data_penelitian, "Penelitian")
+    else:
+        st.warning("Silakan upload data di halaman Beranda terlebih dahulu.")
 
 elif main_menu == "Klasifikasi Pengabdian Masyarakat":
-    # st.markdown("<h2 style='text-align: center; color: #323b4f;'>Klasifikasi Pengabdian Masyarakat</h1>", unsafe_allow_html=True)
-    show_table(data_pengmas, "Pengabdian Masyarakat")
+    if st.session_state.get('data_uploaded', False):
+        uploaded_pengabdian = st.session_state.get('uploaded_pengabdian')
+        data_pengmas = load_data(uploaded_pengabdian)
+        show_table(data_pengmas, "Pengabdian Masyarakat")
+    else:
+        st.warning("Silakan upload data di halaman Beranda terlebih dahulu.")
 
-elif main_menu == "Klasifikasi Judul":
-    st.markdown("<h1 style='text-align: center; color: #323b4f;'>Klasifikasi Judul</h1>", unsafe_allow_html=True)
+
+
 
