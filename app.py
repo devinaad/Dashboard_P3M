@@ -1,15 +1,12 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-import plotly.express as px
 import streamlit_antd_components as sac
 from itables import to_html_datatable
-from joblib import load 
-import numpy as np
+from page_setting.config import setup_page, colors, fields
+from dashboard_menu.dashboard import show_dashboard_page
 from dataset_menu.show_dataset import show_table
 from dataset_menu.load_data import load_data
 from beranda_menu.beranda import show_beranda_page
-from page_setting.config import setup_page, colors, fields
-from dashboard_menu.dashboard import show_dashboard_page
 
 setup_page()
 

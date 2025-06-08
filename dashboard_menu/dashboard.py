@@ -1,11 +1,11 @@
 import streamlit as st
-from components.card import tampilkan_kartu_summary
-from filter_dataset import filter_dataset_by_year
-from components.classification_viz import create_donut_chart
-from components.yearly_P3M import yearly_P3M_viz
-from components.legend import show_legend
-from components.fund_viz import show_fund_viz
-from data_processing.data_processor import DataProcessor
+from dashboard_menu.components.card import tampilkan_kartu_summary
+from dashboard_menu.filter_dataset import filter_dataset_by_year
+from dashboard_menu.components.classification_viz import create_donut_chart
+from dashboard_menu.components.yearly_P3M import yearly_P3M_viz
+from dashboard_menu.components.legend import show_legend
+from dashboard_menu.components.fund_viz import show_fund_viz
+from dashboard_menu.data_processing.data_processor import DataProcessor
 
 def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
     """
