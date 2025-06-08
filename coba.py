@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import streamlit_antd_components as sac
+from streamlit_carousel import carousel
+
 
 # Sidebar with conditional menu enabling
 with st.sidebar:
@@ -33,8 +35,26 @@ with st.sidebar:
 if main_menu == 'Beranda':
     # Your Beranda page logic here
     st.title("🏠 Beranda")
+    def show_carousel_header():
+        # Add this CSS for much better text visibility
+
+        # Your existing carousel code
+        carousel_items = [
+            dict(
+                title="🎯 Sistem Klasifikasi Data",
+                text="Mengklasifikasikan data penelitian dan pengabdian masyarakat",
+                img="https://img.freepik.com/free-photo/artistic-blurry-colorful-wallpaper-background_58702-8233.jpg?semt=ais_items_boosted&w=740",
+            ),
+            dict(
+                title="📊 Dashboard Analisis Data",
+                text="Dashboard Analisis Penelitian dan Pengabdian Masyarakat dengan Visualisasi Interaktif",
+                img="https://static.vecteezy.com/system/resources/previews/011/871/707/large_2x/indigo-gradient-abstract-background-use-it-as-a-banner-design-template-for-ads-websites-platforms-free-photo.jpg",
+            )
+        ]
+        carousel(items=carousel_items)
+    show_carousel_header()   
     st.write("Selamat datang! Silakan upload data Anda untuk memulai.")
-    
+
     # File upload section (example)
     uploaded_file = st.file_uploader("Upload Dataset", type=['csv', 'xlsx'])
     if uploaded_file is not None:

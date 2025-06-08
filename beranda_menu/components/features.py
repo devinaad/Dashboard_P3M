@@ -5,14 +5,14 @@ def show_features():
     with col1:
         st.markdown("""
         <div class="feature-card">
-            <h3>📈 Dashboard Interaktif</h3>
+            <h4>📈 Dashboard Interaktif</h4>
             <p>Visualisasi data yang menarik dan informatif</p>
         </div>
         """, unsafe_allow_html=True)
     with col2:
         st.markdown("""
         <div class="feature-card">
-            <h3>🤖 Klasifikasi Otomatis</h3>
+            <h4>🤖 Klasifikasi Otomatis</h4>
             <p>AI-powered classification untuk judul penelitian</p>
         </div>
         """, unsafe_allow_html=True)

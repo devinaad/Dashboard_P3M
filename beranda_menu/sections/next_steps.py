@@ -1,8 +1,6 @@
 import streamlit as st
 
 def show_next_steps():
-    st.markdown("---")
-    st.markdown("## 🚀 Langkah Selanjutnya")
     col1, col2 = st.columns(2)
 
     with col1:

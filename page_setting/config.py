@@ -81,49 +81,50 @@ def setup_page():
 
         .upload-container {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem;
-            border-radius: 15px;
-            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 0.5rem 0;
             color: white;
         }
 
         .data-card {
             background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 1rem 0;
-            border-left: 4px solid #667eea;
-            transition: 0.3s ease;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 0.5rem 0;
+            border-left: 2px solid #667eea;
+            transition: 0.2s ease;
         }
 
         .data-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
         .feature-card {
             background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 0.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.3rem;
             color: white;
             text-align: center;
-            transition: 0.3s ease;
+            transition: 0.2s ease;
         }
 
         .feature-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
         .stats-card {
             background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 0.7rem;
+            border-radius: 6px;
             text-align: center;
             color: white;
-            margin: 0.5rem 0;
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
         }
 
         .title-gradient {
@@ -131,10 +132,10 @@ def setup_page():
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
         }
 
         .subtitle {

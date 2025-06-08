@@ -44,7 +44,7 @@ with st.sidebar:
                 sac.MenuItem('Klasifikasi Pengabdian Masyarakat', icon='people', disabled=not data_uploaded)
             ])
         ],
-        size='lg',
+        size='md',
         variant='filled', 
         color='indigo', 
         open_all=True,
