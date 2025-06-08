@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-def load_data(uploaded_file):
+def data_loader(uploaded_file):
     try:
         if uploaded_file.name.endswith('.csv'):
             return pd.read_csv(uploaded_file)

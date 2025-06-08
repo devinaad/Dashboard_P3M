@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 import plotly.express as px
 import streamlit_antd_components as sac
 from itables import to_html_datatable
-from joblib import load  # Import load function for loading models
+from joblib import load 
 from streamlit.components.v1 import html
 import datetime
 import numpy as np
@@ -19,110 +19,11 @@ from dashboard_menu.classification_viz import create_donut_chart
 from dashboard_menu.yearly_P3M import yearly_P3M_viz
 from dashboard_menu.card import tampilkan_kartu_summary
 from dashboard_menu.filter_dataset import filter_dataset_by_year
+from dataset_menu.load_data import load_data
+from beranda_menu.beranda import show_beranda_page
+from page_setting.config import setup_page, colors
 
-
-def load_data(file):
-    if file.name.endswith('.csv'):
-        return pd.read_csv(file)
-    elif file.name.endswith('.xlsx'):
-        return pd.read_excel(file)
-    else:
-        st.error("Format file tidak dikenali.")
-        return None
-
-# Set page config
-st.set_page_config(
-    page_title="Analytics Dashboard",
-    page_icon="📊",
-    layout="wide",  # Biarkan "wide" untuk tampilan luas
-    initial_sidebar_state="expanded"  # Sidebar tetap muncul
-)
-
-# Warna untuk kategori
-colors = [
-    "#636EFA", "#EF553B", "#00CC96", "#AB63FA",
-    "#FFA15A", "#19D3F3", "#FF6692"
-]
-
-# Custom CSS - versi default dinamis
-st.markdown("""
-<style>
-    /* Latar belakang utama */
-    .main {
-        background-color: #f8fafc;
-    }
-
-    /* Sidebar default */
-    [data-testid="stSidebar"] {
-        background-color: white;
-    }
-
-    /* Container */
-    .block-container {
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
-    }
-
-    /* Card metrik */
-    .metric-card {
-        border-radius: 0.5rem;
-        padding: 0.5rem;
-        margin: 0.5rem 0;
-        background-color: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .metric-card.blue {
-        background-color: #dbeafe;
-    }
-    .metric-card.green {
-        background-color: #dcfce7;
-    }
-    .metric-card.yellow {
-        background-color: #fef9c3;
-    }
-    .metric-card.purple {
-        background-color: #f3e8ff;
-    }
-
-    .metric-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        text-align: center;
-        color: #1e293b;
-    }
-
-    .metric-label {
-        text-align: center;
-        color: #475569;
-        font-size: 1rem;
-        margin-top: 0.25rem;
-    }
-
-    .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0.7rem;
-        padding: 1rem 0;
-    }
-
-    .stPlotlyChart {
-        outline: 10px solid #b8f9fc;
-        border-radius: 5px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.3);
-    }
-
-    .plot-title {
-        color: black;
-        text-align: center;
-        padding: 5px;
-        margin-bottom: 25px;
-        border-radius: 5px;
-        font-weight: bold;
-    }
-</style>
-""", unsafe_allow_html=True)
-
+setup_page()
 
 # Sidebar
 with st.sidebar:
@@ -152,23 +53,7 @@ with st.sidebar:
 
 # Main content
 if main_menu == 'Beranda':
-    # Your Beranda page logic here
-    st.title("🏠 Beranda")
-    st.write("Selamat datang! Silakan upload data Anda untuk memulai.")
-    
-    # File upload section (example)
-    col1, col2 = st.columns(2)
-    with col1:
-        uploaded_penelitian = st.file_uploader("Upload Data Penelitian", type=['csv', 'xlsx'])
-    with col2:
-        uploaded_pengabdian = st.file_uploader("Upload Data Pengabdian Masyarakat", type=['csv', 'xlsx']
-                                               )
-    if uploaded_penelitian is not None and uploaded_pengabdian is not None:
-        st.session_state['data_uploaded'] = True
-        st.session_state['uploaded_penelitian'] = uploaded_penelitian
-        st.session_state['uploaded_pengabdian'] = uploaded_pengabdian
-        st.success("Data berhasil diupload! Menu lain sekarang dapat diakses.")
-        st.rerun()
+    show_beranda_page()
     
 elif main_menu == "Dashboard":
     if st.session_state.get('data_uploaded', False):
