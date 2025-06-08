@@ -12,3 +12,4 @@ sastrawi
 scikit-learn
 streamlit_date_picker
 datetime
+openpyxl
