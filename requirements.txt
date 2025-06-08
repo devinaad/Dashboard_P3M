@@ -12,4 +12,5 @@ sastrawi
 scikit-learn
 streamlit_date_picker
 datetime
-openpyxl
+openpyxl>=3.1.0
+xlrd>=2.0.0

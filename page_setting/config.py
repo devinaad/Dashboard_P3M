@@ -198,7 +198,24 @@ def setup_page():
     """, unsafe_allow_html=True)
 
 # Warna default (opsional untuk grafik)
+fields = [
+            "Robotics and Mechatronics",
+            "Telecommunications and Networking",
+            "Power and Energy Systems",
+            "Artificial Intelligence and Data Science",
+            "Sensors and Embedded Systems",
+            "Digital Media and Entertainment",
+            "Software Development",
+        ]
 colors = [
-    "#636EFA", "#EF553B", "#00CC96", "#AB63FA",
-    "#FFA15A", "#19D3F3", "#FF6692"
+    "#636EFA",  # Blue
+    "#EF553B",  # Red
+    "#00CC96",  # Green
+    "#AB63FA",  # Purple
+    "#FFA15A",  # Orange
+    "#19D3F3",  # Cyan
+    "#FF6692",  # Pink
+    "#B6E880",  # Light Green
+    "#FF97FF",  # Light Pink
+    "#FECB52"   # Yellow
 ]

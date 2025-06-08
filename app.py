@@ -1,27 +1,15 @@
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.io as pio
 import streamlit as st
-from itertools import islice
-from plotly.subplots import make_subplots
 from streamlit_option_menu import option_menu
-from streamlit_card import card
-import streamlit.components.v1 as components
 import plotly.express as px
 import streamlit_antd_components as sac
 from itables import to_html_datatable
 from joblib import load 
-from streamlit.components.v1 import html
-import datetime
 import numpy as np
 from dataset_menu.show_dataset import show_table
-from dashboard_menu.components.classification_viz import create_donut_chart
-from dashboard_menu.components.yearly_P3M import yearly_P3M_viz
-from dashboard_menu.components.card import tampilkan_kartu_summary
-from dashboard_menu.filter_dataset import filter_dataset_by_year
 from dataset_menu.load_data import load_data
 from beranda_menu.beranda import show_beranda_page
-from page_setting.config import setup_page, colors
+from page_setting.config import setup_page, colors, fields
+from dashboard_menu.dashboard import show_dashboard_page
 
 setup_page()
 
@@ -57,10 +45,13 @@ if main_menu == 'Beranda':
     
 elif main_menu == "Dashboard":
     if st.session_state.get('data_uploaded', False):
-        ""
+        uploaded_penelitian = st.session_state.get('uploaded_penelitian')
+        data_penelitian = load_data(uploaded_penelitian) 
+        uploaded_pengabdian = st.session_state.get('uploaded_pengabdian')
+        data_pengmas = load_data(uploaded_pengabdian)
+        show_dashboard_page(fields, colors, data_penelitian, data_pengmas)
     else:
         st.warning("Silakan upload data di halaman Beranda terlebih dahulu.")
-
 
 elif main_menu == "Klasifikasi Penelitian":
     if st.session_state.get('data_uploaded', False):
