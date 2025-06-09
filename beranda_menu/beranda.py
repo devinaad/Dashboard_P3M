@@ -55,8 +55,13 @@ def show_data_processing_section():
         with col2:
             st.metric("Status", "⏳ Pending", delta="Not Processed")
         
-        # Processing button
-        if st.button("🚀 Start Data Processing", type="primary", use_container_width=True):
+        # Processing button with unique key
+        if st.button(
+            "🚀 Start Data Processing", 
+            type="primary", 
+            use_container_width=True,
+            key="process_data_beranda"
+        ):
             process_data_pipeline()
     
     else:
@@ -86,10 +91,10 @@ def show_data_processing_section():
         with col2:
             st.metric("Status", "✅ Ready", delta="Processed")
         
-        # Option to reprocess
+        # Option to reprocess with unique key
         with st.expander("🔄 Reprocess Data"):
             st.write("Click below if you want to reprocess your data with updated settings.")
-            if st.button("🔄 Reprocess Data", key="reprocess"):
+            if st.button("🔄 Reprocess Data", key="reprocess_data_beranda"):
                 st.session_state['data_processed'] = False
                 st.rerun()
 
@@ -201,5 +206,3 @@ def show_processing_status_sidebar():
         st.sidebar.success("✅ Data ready for analysis")
     else:
         st.sidebar.info("📤 Upload data in Beranda first")
-
-show_beranda_page()

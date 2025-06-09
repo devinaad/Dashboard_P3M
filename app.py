@@ -1,5 +1,8 @@
-# app.py
 import streamlit as st
+
+from page_setting.config import setup_page
+setup_page()
+
 from streamlit_option_menu import option_menu
 import streamlit_antd_components as sac
 from itables import to_html_datatable
@@ -9,8 +12,6 @@ from dataset_menu.show_dataset import show_table
 from dataset_menu.load_data import load_data
 from beranda_menu.beranda import show_beranda_page
 from classify_data.preprocessing_data import process_uploaded_data
-
-setup_page()
 
 def process_and_store_data():
     """

@@ -2,12 +2,14 @@ import streamlit as st
 
 def setup_page():
     # Konfigurasi halaman
-    st.set_page_config(
-        page_title="Sistem Klasifikasi & Analisis P3M",
-        page_icon="📊",
-        layout="wide",
-        initial_sidebar_state="expanded"
-    )
+    if 'page_configured' not in st.session_state:
+        st.set_page_config(
+            page_title="Klasifikasi Data P3M",
+            page_icon="📊",
+            layout="wide",
+            initial_sidebar_state="expanded"
+        )
+        st.session_state.page_configured = True
 
     # Injeksi CSS khusus untuk desain responsif dan dinamis
     st.markdown("""
