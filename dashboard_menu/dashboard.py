@@ -88,6 +88,8 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
                 pengmas_fund_df, "Pengabdian Masyarakat", colors, fields
             )
             st.plotly_chart(fig_pengmas_fund, use_container_width=True)
+            
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Tampilkan legend
     show_legend(fields, colors)
