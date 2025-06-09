@@ -58,7 +58,6 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
     col1, col2 = st.columns(2, gap="large")
 
     with col1:
-        st.markdown("### Distribusi Kategori")
         choose_ptm1 = st.selectbox(
             "Pilih Data",
             ["Penelitian", "Pengabdian Masyarakat"],
@@ -73,7 +72,6 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
             st.plotly_chart(fig2, use_container_width=True)
 
     with col2:
-        st.markdown("### Visualisasi Dana")
         choose_ptm2 = st.selectbox(
             "Pilih Data",
             ["Penelitian", "Pengabdian Masyarakat"],
@@ -92,7 +90,6 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
             st.plotly_chart(fig_pengmas_fund, use_container_width=True)
 
     # Tampilkan legend
-    st.markdown("### Legend")
     show_legend(fields, colors)
     
 
