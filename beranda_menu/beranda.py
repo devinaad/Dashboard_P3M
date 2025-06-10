@@ -16,9 +16,9 @@ def show_beranda_page():
         # Show data processing section
         show_data_processing_section() 
         
-        # Only show next steps if data is processed
-        if st.session_state.get('data_processed', False):
-            show_next_steps()
+        # # Only show next steps if data is processed
+        # if st.session_state.get('data_processed', False):
+        #     show_next_steps()
          
     else: 
         uploaded_penelitian, uploaded_pengabdian, submit_upload = show_upload_section() 

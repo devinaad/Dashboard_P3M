@@ -24,7 +24,7 @@ custom_style = """
     }
 
     table.dataTable th {
-        background-color: #323b4f;
+        background-color: #38519c;
         color: white;
         padding: 10px;
         border: 1px solid #ddd;

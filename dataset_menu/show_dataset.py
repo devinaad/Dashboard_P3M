@@ -4,11 +4,12 @@ import pandas as pd
 import streamlit as st
 from dataset_menu.table_setting import get_datatable_options
 from dataset_menu.table_css import custom_style
-
+from dataset_menu.download_data import add_download_section
 
 def show_table(dataframe, dataframe_name):
-    st.markdown(f"<h2 style='text-align: center; color: #323b4f;'>Klasifikasi {dataframe_name}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<h2 class='title-gradient'>Klasifikasi {dataframe_name}</h1>", unsafe_allow_html=True)
 
+    add_download_section(dataframe, filename_prefix="data"+dataframe_name)
     # Get dynamic datatable options based on the dataframe
     datatable_options = get_datatable_options(dataframe)
 

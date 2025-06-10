@@ -18,7 +18,7 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
         data_pengabdian (pd.DataFrame): Data pengabdian masyarakat
     """
     
-    st.markdown("<h1 style='text-align: center; color: #323b4f;'>Analytics Dashboard</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='title-gradient'>Analytics Dashboard</h1>", unsafe_allow_html=True)
 
     # Filter dataset berdasarkan tahun
     filtered_penelitian, filtered_pengmas, label_tahun = filter_dataset_by_year(
