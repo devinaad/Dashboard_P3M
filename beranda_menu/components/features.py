@@ -13,7 +13,7 @@ def show_features():
         st.markdown("""
         <div class="feature-card">
             <h4>🤖 Klasifikasi Otomatis</h4>
-            <p>AI-powered classification untuk judul penelitian</p>
+            <p>AI-powered classification untuk judul P3M</p>
         </div>
         """, unsafe_allow_html=True)
     st.markdown("---")
