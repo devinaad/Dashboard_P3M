@@ -41,24 +41,24 @@ def show_data_processing_section():
     data_processed = st.session_state.get('data_processed', False)
     
     if not data_processed:
-        st.subheader("🔄 Data Processing Required")
+        st.subheader("🔄 Pemrosesan Data Diperlukan")
         
         # Show processing status
         col1, col2 = st.columns([3, 1])
         
         with col1:
-            st.info("📊 Your data needs to be preprocessed and classified before use in Dashboard and Dataset pages.")
-            st.write("**What will happen during processing:**")
-            st.write("• Text cleaning and preprocessing")
-            st.write("• Automatic classification of research fields")
-            st.write("• Data preparation for visualization")
+            st.info("📊 Data Anda perlu diproses dan diklasifikasikan sebelum digunakan di halaman Dasbor dan Dataset.")
+            st.write("**Langkah-langkah selama pemrosesan:**")
+            st.write("• Pembersihan dan pra-pemrosesan teks")
+            st.write("• Klasifikasi otomatis bidang penelitian")
+            st.write("• Persiapan data untuk visualisasi")
         
         with col2:
-            st.metric("Status", "⏳ Pending", delta="Not Processed")
+            st.metric("Status", "⏳ Menunggu", delta="Belum Diproses")
         
         # Processing button with unique key
         if st.button(
-            "🚀 Start Data Processing", 
+            "🚀 Mulai Pemrosesan Data", 
             type="primary", 
             use_container_width=True,
             key="process_data_beranda"
@@ -67,36 +67,35 @@ def show_data_processing_section():
             st.rerun()
     
     else:
-        st.subheader("✅ Data Processing Complete")
+        st.subheader("✅ Pemrosesan Data Selesai")
         
         # Show processing results
         col1, col2 = st.columns([3, 1])
         
         with col1:
-            st.success("🎉 Your data has been successfully processed and is ready to use!")
+            st.success("🎉 Data Anda berhasil diproses dan siap digunakan!")
             
             # Show processing results summary
             if 'processed_penelitian' in st.session_state:
                 df_penelitian = st.session_state['processed_penelitian']
-                st.write(f"**📚 Penelitian Data:** {len(df_penelitian)} records processed")
+                st.write(f"**📚 Data Penelitian:** {len(df_penelitian)} entri telah diproses")
                 if 'Bidang Penelitian' in df_penelitian.columns:
                     unique_bidang = df_penelitian['Bidang Penelitian'].nunique()
-                    st.write(f"   → {unique_bidang} unique research fields identified")
+                    st.write(f"   → {unique_bidang} bidang penelitian unik teridentifikasi")
             
             if 'processed_pengabdian' in st.session_state:
                 df_pengabdian = st.session_state['processed_pengabdian']
-                st.write(f"**🤝 Pengabdian Data:** {len(df_pengabdian)} records processed")
+                st.write(f"**🤝 Data Pengabdian:** {len(df_pengabdian)} entri telah diproses")
                 if 'Bidang Pengabdian Masyarakat' in df_pengabdian.columns:
                     unique_bidang = df_pengabdian['Bidang Pengabdian Masyarakat'].nunique()
-                    st.write(f"   → {unique_bidang} unique service fields identified")
+                    st.write(f"   → {unique_bidang} bidang pengabdian unik teridentifikasi")
         
         with col2:
-            st.metric("Status", "✅ Ready", delta="Processed")
+            st.metric("Status", "✅ Siap", delta="Sudah Diproses")
         
-        # Option to reprocess with unique key
-        with st.expander("🔄 Reprocess Data"):
-            st.write("Click below if you want to reprocess your data with updated settings.")
-            if st.button("🔄 Reprocess Data", key="reprocess_data_beranda"):
+        with st.expander("🔄 Proses Ulang Data"):
+            st.write("Klik tombol di bawah jika Anda ingin memproses ulang data dengan pengaturan terbaru.")
+            if st.button("🔄 Proses Ulang Data", key="reprocess_data_beranda"):
                 st.session_state['data_processed'] = False
                 st.rerun()
 
@@ -113,10 +112,10 @@ def process_data_pipeline():
         try:
             dosen_prodi = pd.read_excel('classify_data/dosen_prodi.xlsx')
         except FileNotFoundError:
-            st.error("❌ Error: dosen_prodi.xlsx file not found")
+            st.error("❌ Kesalahan: File dosen_prodi.xlsx tidak ditemukan")
             return
         except Exception as e:
-            st.error(f"❌ Error reading dosen data: {str(e)}")
+            st.error(f"❌ Gagal membaca data dosen: {str(e)}")
             return
         
         # Create progress tracking
@@ -139,7 +138,7 @@ def process_data_pipeline():
             # Process Penelitian data
             if 'uploaded_penelitian' in st.session_state and st.session_state.uploaded_penelitian is not None:
                 current_step += 1
-                status_text.text(f'🔄 Processing Penelitian data... ({current_step}/{total_steps})')
+                status_text.text(f'🔄 Memproses data Penelitian... ({current_step}/{total_steps})')
                 
                 try:
                     # Load raw data
@@ -159,16 +158,16 @@ def process_data_pipeline():
                     progress_bar.progress(current_step / total_steps * 0.75)
                     
                     # Show success for this dataset
-                    st.success(f"✅ Penelitian data processed: {len(processed_penelitian)} records")
+                    st.success(f"✅ Data Penelitian berhasil diproses: {len(processed_penelitian)} entri")
                     
                 except Exception as e:
-                    st.error(f"❌ Error processing Penelitian data: {str(e)}")
+                    st.error(f"❌ Gagal memproses data Penelitian: {str(e)}")
                     return
             
             # Process Pengabdian data
             if 'uploaded_pengabdian' in st.session_state and st.session_state.uploaded_pengabdian is not None:
                 current_step += 1
-                status_text.text(f'🔄 Processing Pengabdian Masyarakat data... ({current_step}/{total_steps})')
+                status_text.text(f'🔄 Memproses data Pengabdian Masyarakat... ({current_step}/{total_steps})')
                 
                 try:
                     # Load raw data
@@ -186,15 +185,15 @@ def process_data_pipeline():
                     st.session_state['processed_pengabdian'] = processed_pengabdian
                     
                     # Show success for this dataset
-                    st.success(f"✅ Pengabdian Masyarakat data processed: {len(processed_pengabdian)} records")
+                    st.success(f"✅ Data Pengabdian berhasil diproses: {len(processed_pengabdian)} entri")
                     
                 except Exception as e:
-                    st.error(f"❌ Error processing Pengabdian data: {str(e)}")
+                    st.error(f"❌ Gagal memproses data Pengabdian: {str(e)}")
                     return
             
             # Complete processing
             progress_bar.progress(1.0)
-            status_text.text('🎉 Processing completed successfully!')
+            status_text.text('🎉 Pemrosesan selesai dengan sukses!')
             
             # Mark as processed
             st.session_state['data_processed'] = True
@@ -203,14 +202,12 @@ def process_data_pipeline():
             st.balloons()
         
     except ImportError as e:
-        st.error(f"❌ Missing required modules: {str(e)}")
-        st.info("💡 Make sure all processing modules are properly installed and configured.")
+        st.error(f"❌ Modul yang dibutuhkan tidak ditemukan: {str(e)}")
+        st.info("💡 Pastikan semua modul sudah terinstal dan dikonfigurasi dengan benar.")
         
     except Exception as e:
-        st.error(f"❌ Error during processing: {str(e)}")
-        st.info("💡 Please check your data format and try again. If the problem persists, contact support.")
-        
-        # Reset processing status on error
+        st.error(f"❌ Terjadi kesalahan saat memproses data: {str(e)}")
+        st.info("💡 Periksa format data Anda dan coba lagi. Jika masalah terus berlanjut, hubungi tim bantuan.")
         st.session_state['data_processed'] = False
 
 def show_processing_status_sidebar():
@@ -221,9 +218,9 @@ def show_processing_status_sidebar():
     data_processed = st.session_state.get('data_processed', False)
     
     if data_uploaded and not data_processed:
-        st.sidebar.warning("⚠️ Data uploaded but not processed")
-        st.sidebar.info("👆 Go to Beranda to process your data")
+        st.sidebar.warning("⚠️ Data sudah diunggah namun belum diproses")
+        st.sidebar.info("👆 Kembali ke halaman Beranda untuk memproses data")
     elif data_processed:
-        st.sidebar.success("✅ Data ready for analysis")
+        st.sidebar.success("✅ Data siap untuk dianalisis")
     else:
-        st.sidebar.info("📤 Upload data in Beranda first")
+        st.sidebar.info("📤 Unggah data terlebih dahulu di halaman Beranda")

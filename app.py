@@ -19,15 +19,14 @@ def process_and_store_data():
     Process uploaded data through preprocessing and classification pipeline
     """
     try:
-        # Read data dosen - Add error handling for file reading
         try:
             dosen_prodi = pd.read_excel('classify_data/dosen_prodi.xlsx')
             st.write(dosen_prodi)
         except FileNotFoundError:
-            st.error("❌ Error: dosen_prodi.xlsx file not found")
+            st.error("❌ Kesalahan: File dosen_prodi.xlsx tidak ditemukan")
             return
         except Exception as e:
-            st.error(f"❌ Error reading dosen data: {str(e)}")
+            st.error(f"❌ Gagal membaca data dosen: {str(e)}")
             return
 
         # Check if raw data exists in session state
@@ -53,33 +52,42 @@ def process_and_store_data():
                     st.error(f"❌ Error processing Penelitian data: {str(e)}")
                     return
         
-        if 'uploaded_pengabdian' in st.session_state and st.session_state.uploaded_pengabdian is not None:
-            with st.spinner('Processing Pengabdian Masyarakat data...'):
+        if 'uploaded_penelitian' in st.session_state and st.session_state.uploaded_penelitian is not None:
+            with st.spinner('🔄 Memproses data Penelitian...'):
                 try:
-                    # Load raw data
-                    raw_pengabdian = load_data(st.session_state.uploaded_pengabdian)
-                    
-                    # ✅ FIXED - Pass dosen_prodi as positional argument (remove 'dosen_df=')
-                    processed_pengabdian = process_uploaded_data(
-                        raw_pengabdian,         # First positional argument: raw data
-                        dosen_prodi,           # Second positional argument: dosen dataframe (NO keyword!)
-                        data_type='pengabdian', # Keyword argument
-                        title_column='Judul'    # Keyword argument
+                    raw_penelitian = load_data(st.session_state.uploaded_penelitian)
+                    processed_penelitian = process_uploaded_data(
+                        raw_penelitian,
+                        dosen_prodi,
+                        data_type='penelitian',
+                        title_column='Judul'
                     )
-                    
-                    # Store processed data in session state
-                    st.session_state['processed_pengabdian'] = processed_pengabdian
-                    st.success("✅ Pengabdian Masyarakat data processed successfully!")
-                    
+                    st.session_state['processed_penelitian'] = processed_penelitian
+                    st.success("✅ Data Penelitian berhasil diproses!")
                 except Exception as e:
-                    st.error(f"❌ Error processing Pengabdian data: {str(e)}")
+                    st.error(f"❌ Gagal memproses data Penelitian: {str(e)}")
                     return
         
-        # Mark data as processed only if we reach this point without errors
+        if 'uploaded_pengabdian' in st.session_state and st.session_state.uploaded_pengabdian is not None:
+            with st.spinner('🔄 Memproses data Pengabdian Masyarakat...'):
+                try:
+                    raw_pengabdian = load_data(st.session_state.uploaded_pengabdian)
+                    processed_pengabdian = process_uploaded_data(
+                        raw_pengabdian,
+                        dosen_prodi,
+                        data_type='pengabdian',
+                        title_column='Judul'
+                    )
+                    st.session_state['processed_pengabdian'] = processed_pengabdian
+                    st.success("✅ Data Pengabdian Masyarakat berhasil diproses!")
+                except Exception as e:
+                    st.error(f"❌ Gagal memproses data Pengabdian Masyarakat: {str(e)}")
+                    return
+        
         st.session_state['data_processed'] = True
         
     except Exception as e:
-        st.error(f"❌ Unexpected error in data processing: {str(e)}")
+        st.error(f"❌ Terjadi kesalahan tak terduga saat memproses data: {str(e)}")
         st.session_state['data_processed'] = False
 
 # Sidebar
@@ -90,11 +98,11 @@ with st.sidebar:
     
     # Show processing status 
     if data_uploaded and not data_processed:
-        st.warning("⚠️ Data uploaded but not processed yet")
+        st.warning("⚠️ Data sudah diunggah, tetapi belum diproses")
     elif data_processed:
-        st.success("✅ Data processed and ready to use")
+        st.success("✅ Data telah diproses dan siap digunakan")
     else:
-        st.info("📤 Upload data in Beranda first")
+        st.info("📤 Unggah data terlebih dahulu melalui menu Beranda")
     
     main_menu = sac.menu(
         items=[
@@ -117,19 +125,18 @@ with st.sidebar:
 # Main content
 if main_menu == 'Beranda':
     show_beranda_page()
-    
-elif main_menu == "Dashboard":
+
+elif main_menu == "Dasbor":
     if st.session_state.get('data_processed', False):
-        # Use processed data instead of raw data
         data_penelitian = st.session_state.get('processed_penelitian')
         data_pengmas = st.session_state.get('processed_pengabdian')
         
         if data_penelitian is not None or data_pengmas is not None:
             show_dashboard_page(fields, colors, data_penelitian, data_pengmas)
         else:
-            st.warning("⚠️ No processed data available. Please upload and process data first.")
+            st.warning("⚠️ Tidak ada data yang tersedia. Silakan unggah dan proses data terlebih dahulu.")
     else:
-        st.warning("⚠️ Please upload and process data in the Beranda page first.")
+        st.warning("⚠️ Silakan unggah dan proses data terlebih dahulu melalui menu Beranda.")
 
 elif main_menu == "Klasifikasi Penelitian":
     if st.session_state.get('data_processed', False):
@@ -138,9 +145,9 @@ elif main_menu == "Klasifikasi Penelitian":
         if data_penelitian is not None:
             show_table(data_penelitian, "Penelitian")
         else:
-            st.warning("⚠️ No Penelitian data available. Please upload and process data first.")
+            st.warning("⚠️ Data Penelitian tidak tersedia. Silakan unggah dan proses data terlebih dahulu.")
     else:
-        st.warning("⚠️ Please upload and process data in the Beranda page first.")
+        st.warning("⚠️ Silakan unggah dan proses data terlebih dahulu melalui menu Beranda.")
 
 elif main_menu == "Klasifikasi Pengabdian Masyarakat":
     if st.session_state.get('data_processed', False):
@@ -149,6 +156,6 @@ elif main_menu == "Klasifikasi Pengabdian Masyarakat":
         if data_pengmas is not None:
             show_table(data_pengmas, "Pengabdian Masyarakat")
         else:
-            st.warning("⚠️ No Pengabdian Masyarakat data available. Please upload and process data first.")
+            st.warning("⚠️ Data Pengabdian Masyarakat tidak tersedia. Silakan unggah dan proses data terlebih dahulu.")
     else:
-        st.warning("⚠️ Please upload and process data in the Beranda page first.")
+        st.warning("⚠️ Silakan unggah dan proses data terlebih dahulu melalui menu Beranda.")
