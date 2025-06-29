@@ -6,6 +6,7 @@ from dashboard_menu.components.yearly_P3M import yearly_P3M_viz
 from dashboard_menu.components.legend import show_legend
 from dashboard_menu.components.fund_viz import show_fund_viz
 from dashboard_menu.data_processing.data_processor import DataProcessor
+from dashboard_menu.components.prodi_viz import show_prodi_analysis  # Updated import
 
 def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
     """
@@ -25,7 +26,7 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
         data_penelitian, data_pengabdian
     )
     
-        # Tampilkan informasi filter
+    # Tampilkan informasi filter
     if label_tahun != "Semua Tahun":
         st.info(f"📊 Data yang ditampilkan: {label_tahun}")
     else:
@@ -55,16 +56,14 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
     yearly_P3M_viz(filtered_penelitian, filtered_pengmas)
 
     # Layout Streamlit untuk donut charts dan fund visualization
+    choose_p3m = st.selectbox(
+    "Pilih Data",
+    ["Penelitian", "Pengabdian Masyarakat"],
+    key="ptm1")
+
     col1, col2 = st.columns(2, gap="large")
-
     with col1:
-        choose_ptm1 = st.selectbox(
-            "Pilih Data",
-            ["Penelitian", "Pengabdian Masyarakat"],
-            key="ptm1"
-        )
-
-        if choose_ptm1 == "Penelitian":
+        if choose_p3m == "Penelitian":
             fig1 = create_donut_chart(fields, penelitian_values, "Kategori Data Penelitian P3M", colors)
             st.plotly_chart(fig1, use_container_width=True)
         else:
@@ -72,13 +71,7 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
             st.plotly_chart(fig2, use_container_width=True)
 
     with col2:
-        choose_ptm2 = st.selectbox(
-            "Pilih Data",
-            ["Penelitian", "Pengabdian Masyarakat"],
-            key="ptm2"
-        )
-
-        if choose_ptm2 == "Penelitian":
+        if choose_p3m == "Penelitian":
             fig_penelitian_fund = show_fund_viz(
                 penelitian_fund_df, "Penelitian", colors, fields
             )
@@ -94,4 +87,6 @@ def show_dashboard_page(fields, colors, data_penelitian, data_pengabdian):
     # Tampilkan legend
     show_legend(fields, colors)
     
-
+    # UPDATED SECTION: Simplified Study Program Analysis
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    show_prodi_analysis(filtered_penelitian, filtered_pengmas)
