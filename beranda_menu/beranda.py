@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from beranda_menu.components.header import show_header
 from beranda_menu.components.features import show_features
 from beranda_menu.components.upload_section import show_upload_section
@@ -63,6 +64,7 @@ def show_data_processing_section():
             key="process_data_beranda"
         ):
             process_data_pipeline()
+            st.rerun()
     
     else:
         st.subheader("✅ Data Processing Complete")
@@ -104,8 +106,18 @@ def process_data_pipeline():
     """
     try:
         # Import processing functions
-        from classify_data.preprocessing_data import process_uploaded_data
         from dataset_menu.load_data import load_data
+        from classify_data.preprocessing_data import process_uploaded_data
+        
+        # Read dosen data - Add error handling for file reading
+        try:
+            dosen_prodi = pd.read_excel('classify_data/dosen_prodi.xlsx')
+        except FileNotFoundError:
+            st.error("❌ Error: dosen_prodi.xlsx file not found")
+            return
+        except Exception as e:
+            st.error(f"❌ Error reading dosen data: {str(e)}")
+            return
         
         # Create progress tracking
         progress_container = st.container()
@@ -129,44 +141,56 @@ def process_data_pipeline():
                 current_step += 1
                 status_text.text(f'🔄 Processing Penelitian data... ({current_step}/{total_steps})')
                 
-                # Load raw data
-                raw_penelitian = load_data(st.session_state.uploaded_penelitian)
-                progress_bar.progress(current_step / total_steps * 0.5)
-                
-                # Process through pipeline
-                processed_penelitian = process_uploaded_data(
-                    raw_penelitian, 
-                    data_type='penelitian', 
-                    title_column='Judul'
-                )
-                
-                # Store processed data
-                st.session_state['processed_penelitian'] = processed_penelitian
-                progress_bar.progress(current_step / total_steps * 0.75)
-                
-                # Show success for this dataset
-                st.success(f"✅ Penelitian data processed: {len(processed_penelitian)} records")
+                try:
+                    # Load raw data
+                    raw_penelitian = load_data(st.session_state.uploaded_penelitian)
+                    progress_bar.progress(current_step / total_steps * 0.5)
+                    
+                    # Process through pipeline - Use the correct function signature
+                    processed_penelitian = process_uploaded_data(
+                        raw_penelitian,         # First positional argument: raw data
+                        dosen_prodi,           # Second positional argument: dosen dataframe
+                        data_type='penelitian', # Keyword argument
+                        title_column='Judul'    # Keyword argument
+                    )
+                    
+                    # Store processed data
+                    st.session_state['processed_penelitian'] = processed_penelitian
+                    progress_bar.progress(current_step / total_steps * 0.75)
+                    
+                    # Show success for this dataset
+                    st.success(f"✅ Penelitian data processed: {len(processed_penelitian)} records")
+                    
+                except Exception as e:
+                    st.error(f"❌ Error processing Penelitian data: {str(e)}")
+                    return
             
             # Process Pengabdian data
             if 'uploaded_pengabdian' in st.session_state and st.session_state.uploaded_pengabdian is not None:
                 current_step += 1
                 status_text.text(f'🔄 Processing Pengabdian Masyarakat data... ({current_step}/{total_steps})')
                 
-                # Load raw data
-                raw_pengabdian = load_data(st.session_state.uploaded_pengabdian)
-                
-                # Process through pipeline
-                processed_pengabdian = process_uploaded_data(
-                    raw_pengabdian, 
-                    data_type='pengabdian', 
-                    title_column='Judul'
-                )
-                
-                # Store processed data
-                st.session_state['processed_pengabdian'] = processed_pengabdian
-                
-                # Show success for this dataset
-                st.success(f"✅ Pengabdian Masyarakat data processed: {len(processed_pengabdian)} records")
+                try:
+                    # Load raw data
+                    raw_pengabdian = load_data(st.session_state.uploaded_pengabdian)
+                    
+                    # Process through pipeline - Use the correct function signature
+                    processed_pengabdian = process_uploaded_data(
+                        raw_pengabdian,         # First positional argument: raw data
+                        dosen_prodi,           # Second positional argument: dosen dataframe
+                        data_type='pengabdian', # Keyword argument
+                        title_column='Judul'    # Keyword argument
+                    )
+                    
+                    # Store processed data
+                    st.session_state['processed_pengabdian'] = processed_pengabdian
+                    
+                    # Show success for this dataset
+                    st.success(f"✅ Pengabdian Masyarakat data processed: {len(processed_pengabdian)} records")
+                    
+                except Exception as e:
+                    st.error(f"❌ Error processing Pengabdian data: {str(e)}")
+                    return
             
             # Complete processing
             progress_bar.progress(1.0)
@@ -177,9 +201,6 @@ def process_data_pipeline():
             
             # Show celebration
             st.balloons()
-            
-            # Auto-refresh to update UI
-            st.rerun()
         
     except ImportError as e:
         st.error(f"❌ Missing required modules: {str(e)}")

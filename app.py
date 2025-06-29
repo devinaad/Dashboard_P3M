@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 from page_setting.config import setup_page
 setup_page()
@@ -18,44 +19,67 @@ def process_and_store_data():
     Process uploaded data through preprocessing and classification pipeline
     """
     try:
+        # Read data dosen - Add error handling for file reading
+        try:
+            dosen_prodi = pd.read_excel('classify_data/dosen_prodi.xlsx')
+            st.write(dosen_prodi)
+        except FileNotFoundError:
+            st.error("❌ Error: dosen_prodi.xlsx file not found")
+            return
+        except Exception as e:
+            st.error(f"❌ Error reading dosen data: {str(e)}")
+            return
+
         # Check if raw data exists in session state
         if 'uploaded_penelitian' in st.session_state and st.session_state.uploaded_penelitian is not None:
             with st.spinner('Processing Penelitian data...'):
-                # Load raw data
-                raw_penelitian = load_data(st.session_state.uploaded_penelitian)
-                
-                # Process through pipeline
-                processed_penelitian = process_uploaded_data(
-                    raw_penelitian, 
-                    data_type='penelitian', 
-                    title_column='Judul'
-                )
-                
-                # Store processed data in session state
-                st.session_state['processed_penelitian'] = processed_penelitian
-                st.success("✅ Penelitian data processed successfully!")
+                try:
+                    # Load raw data
+                    raw_penelitian = load_data(st.session_state.uploaded_penelitian)
+                    
+                    # ✅ FIXED - Pass dosen_prodi as positional argument (remove 'dosen_df=')
+                    processed_penelitian = process_uploaded_data(
+                        raw_penelitian,         # First positional argument: raw data
+                        dosen_prodi,           # Second positional argument: dosen dataframe (NO keyword!)
+                        data_type='penelitian', # Keyword argument
+                        title_column='Judul'    # Keyword argument
+                    )
+                    
+                    # Store processed data in session state
+                    st.session_state['processed_penelitian'] = processed_penelitian
+                    st.success("✅ Penelitian data processed successfully!")
+                    
+                except Exception as e:
+                    st.error(f"❌ Error processing Penelitian data: {str(e)}")
+                    return
         
         if 'uploaded_pengabdian' in st.session_state and st.session_state.uploaded_pengabdian is not None:
             with st.spinner('Processing Pengabdian Masyarakat data...'):
-                # Load raw data
-                raw_pengabdian = load_data(st.session_state.uploaded_pengabdian)
-                
-                # Process through pipeline
-                processed_pengabdian = process_uploaded_data(
-                    raw_pengabdian, 
-                    data_type='pengabdian', 
-                    title_column='Judul'
-                )
-                
-                # Store processed data in session state
-                st.session_state['processed_pengabdian'] = processed_pengabdian
-                st.success("✅ Pengabdian Masyarakat data processed successfully!")
+                try:
+                    # Load raw data
+                    raw_pengabdian = load_data(st.session_state.uploaded_pengabdian)
+                    
+                    # ✅ FIXED - Pass dosen_prodi as positional argument (remove 'dosen_df=')
+                    processed_pengabdian = process_uploaded_data(
+                        raw_pengabdian,         # First positional argument: raw data
+                        dosen_prodi,           # Second positional argument: dosen dataframe (NO keyword!)
+                        data_type='pengabdian', # Keyword argument
+                        title_column='Judul'    # Keyword argument
+                    )
+                    
+                    # Store processed data in session state
+                    st.session_state['processed_pengabdian'] = processed_pengabdian
+                    st.success("✅ Pengabdian Masyarakat data processed successfully!")
+                    
+                except Exception as e:
+                    st.error(f"❌ Error processing Pengabdian data: {str(e)}")
+                    return
         
-        # Mark data as processed
+        # Mark data as processed only if we reach this point without errors
         st.session_state['data_processed'] = True
         
     except Exception as e:
-        st.error(f"❌ Error processing data: {str(e)}")
+        st.error(f"❌ Unexpected error in data processing: {str(e)}")
         st.session_state['data_processed'] = False
 
 # Sidebar
@@ -64,14 +88,13 @@ with st.sidebar:
     data_uploaded = st.session_state.get('data_uploaded', False)
     data_processed = st.session_state.get('data_processed', False)
     
-    # Show processing status
+    # Show processing status 
     if data_uploaded and not data_processed:
-        st.info("📊 Data uploaded but not processed yet")
-        if st.button("🔄 Process Data", help="Click to preprocess and classify uploaded data"):
-            process_and_store_data()
-            st.rerun()
+        st.warning("⚠️ Data uploaded but not processed yet")
     elif data_processed:
         st.success("✅ Data processed and ready to use")
+    else:
+        st.info("📤 Upload data in Beranda first")
     
     main_menu = sac.menu(
         items=[
