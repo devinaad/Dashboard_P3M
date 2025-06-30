@@ -281,49 +281,6 @@ def classify_and_prepare_data(df, data_type='penelitian', title_column='Judul'):
     
     return final_df
 
-# def process_uploaded_data(df, dosen_df, data_type='penelitian', title_column='Judul'):
-#     """
-#     Complete pipeline: preprocess -> add prodi mapping -> classify -> prepare final data
-    
-#     Args:
-#         df (pd.DataFrame): Raw uploaded dataframe (needs processing)
-#         dosen_df (pd.DataFrame): Pre-processed lecturer database (already available in system)
-#         data_type (str): Type of data ('penelitian' or 'pengabdian')
-#         title_column (str): Name of the column containing titles
-    
-#     Returns:
-#         pd.DataFrame: Final processed and classified dataframe
-        
-#     Pipeline Steps:
-#         1. Preprocess uploaded data (clean titles for classification)
-#         2. Add program mapping using pre-processed lecturer database
-#         3. Classify data using machine learning models
-#         4. Prepare final dataset with required columns
-        
-#     Note: The dosen_df is already processed and maintained by the system,
-#           so users only need to upload their research/community service data
-#     """
-#     print(f"Starting data processing for {data_type}...")
-    
-#     # Step 1: Preprocess uploaded data
-#     print("Step 1: Preprocessing uploaded data...")
-#     preprocessed_df = preprocess_data(df, title_column)
-    
-#     # Step 2: Add program mapping using system's lecturer database
-#     if 'Nama Ketua' in preprocessed_df.columns:
-#         print("Step 2: Adding program mapping using lecturer database...")
-#         preprocessed_df = add_prodi_mapping(preprocessed_df, dosen_df)
-#     else:
-#         print("Step 2: No 'Nama Ketua' column found, skipping program mapping")
-#         # Add default Prodi column
-#         preprocessed_df['Prodi'] = 'Lainnya'
-    
-#     # Step 3: Classify and prepare final data
-#     print("Step 3: Classifying data using ML models...")
-#     final_df = classify_and_prepare_data(preprocessed_df, data_type, title_column)
-    
-#     print(f"Data processing completed. Final shape: {final_df.shape}")
-#     return final_df
 
 def process_uploaded_data(df, dosen_df, data_type='penelitian', title_column='Judul'):
     """

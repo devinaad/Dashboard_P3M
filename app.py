@@ -126,7 +126,7 @@ with st.sidebar:
 if main_menu == 'Beranda':
     show_beranda_page()
 
-elif main_menu == "Dasbor":
+elif main_menu == "Dashboard":
     if st.session_state.get('data_processed', False):
         data_penelitian = st.session_state.get('processed_penelitian')
         data_pengmas = st.session_state.get('processed_pengabdian')

@@ -14,18 +14,16 @@ def setup_page():
     # Injeksi CSS khusus untuk desain responsif dan dinamis
     st.markdown("""
     <style>
-        /* Latar belakang utama */
+        /* Your existing CSS styles remain the same */
         .main {
             background-color: #f8fafc;
         }
 
-        /* Container utama */
         .block-container {
             padding-left: 2rem !important;
             padding-right: 2rem !important;
         }
 
-        /* Kartu metrik */
         .metric-card {
             border-radius: 0.5rem;
             padding: 0.5rem;
@@ -44,6 +42,7 @@ def setup_page():
         .metric-card.green { background-color: #dcfce7; }
         .metric-card.yellow { background-color: #fef9c3; }
         .metric-card.purple { background-color: #f3e8ff; }
+        .metric-card.gray { background-color: #f1f5f9; }  /* New gray card for uncategorized */
 
         .metric-value {
             font-size: 1.5rem;
@@ -81,6 +80,18 @@ def setup_page():
             font-weight: bold;
         }
 
+        /* Uncategorized data styling */
+        .uncategorized-notice {
+            background: linear-gradient(135deg, #6b7280 0%, #374151 100%);
+            padding: 0.8rem;
+            border-radius: 6px;
+            color: white;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Rest of your existing CSS styles */
         .upload-container {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 1rem;
@@ -147,7 +158,6 @@ def setup_page():
             margin-bottom: 2rem;
         }
 
-        /* Flex Utility */
         .flex-row {
             display: flex;
             flex-wrap: wrap;
@@ -159,7 +169,6 @@ def setup_page():
             flex: 1 1 200px;
         }
 
-        /* Responsif */
         @media (max-width: 768px) {
             .title-gradient {
                 font-size: 2rem;
@@ -199,16 +208,18 @@ def setup_page():
     </style>
     """, unsafe_allow_html=True)
 
-# Warna default (opsional untuk grafik)
+
 fields = [
-            "Robotics and Mechatronics",
-            "Telecommunications and Networking",
-            "Power and Energy Systems",
-            "Artificial Intelligence and Data Science",
-            "Sensors and Embedded Systems",
-            "Digital Media and Entertainment",
-            "Software Development",
-        ]
+    "Robotics and Mechatronics",
+    "Telecommunications and Networking", 
+    "Power and Energy Systems",
+    "Artificial Intelligence and Data Science",
+    "Sensors and Embedded Systems",
+    "Digital Media and Entertainment",
+    "Software Development",
+]
+
+# Main colors for classified data
 colors = [
     "#636EFA",  # Blue
     "#EF553B",  # Red
@@ -221,3 +232,47 @@ colors = [
     "#FF97FF",  # Light Pink
     "#FECB52"   # Yellow
 ]
+
+# Terms that indicate uncategorized data
+uncategorized_terms = [
+    "Belum Terklasifikasi",
+    "Error Klasifikasi", 
+    "Tidak Terkategorikan",
+    "Lainnya",
+    "Unknown",
+    "Uncategorized",
+    "N/A",
+    ""
+]
+
+
+def prepare_data_with_uncategorized(df, classification_column, fields, uncategorized_terms):
+    """
+    Prepare data by separating categorized and uncategorized entries
+    
+    Args:
+        df (pd.DataFrame): Input dataframe
+        classification_column (str): Name of the classification column
+        fields (list): List of valid classification categories
+        uncategorized_terms (list): List of terms that indicate uncategorized data
+    
+    Returns:
+        tuple: (categorized_df, uncategorized_df, has_uncategorized)
+    """
+    print(f"🔍 Preparing data with uncategorized support...")
+    print(f"   Total records: {len(df)}")
+    
+    # Identify uncategorized data
+    uncategorized_mask = df[classification_column].isin(uncategorized_terms) | df[classification_column].isna()
+    
+    # Separate categorized and uncategorized data
+    categorized_df = df[~uncategorized_mask].copy()
+    uncategorized_df = df[uncategorized_mask].copy()
+    
+    has_uncategorized = len(uncategorized_df) > 0
+    
+    print(f"   Categorized records: {len(categorized_df)}")
+    print(f"   Uncategorized records: {len(uncategorized_df)}")
+    print(f"   Has uncategorized data: {has_uncategorized}")
+    
+    return categorized_df, uncategorized_df, has_uncategorized
